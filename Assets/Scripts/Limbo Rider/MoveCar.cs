@@ -3,44 +3,86 @@ using DG.Tweening;
 
 public class MOveCar : MonoBehaviour
 {
-    public Transform model;          // Assign the model in the Inspector
-    public float duration = 1f;      // Duration of the animation
-    public Transform previoustransform;
+    public Transform model;
+    public float moveDuration = 1f;
+    public float shrinkScale = 0.15f;
 
-    void Start()
+    private Vector3 startPos = new Vector3(0, -150, 0);
+    private Vector3 endPos = new Vector3(0, -20, 0);
+    private Tween revBounceTween;
+
+    public void CarAnim()
     {
+        StartRev();
+        Invoke("StopRev", 3f);
+        Invoke("MoveCarAnim", 3f + moveDuration);
+    }
 
+
+    public void StartRev(float tiltAngle = 1f)
+    {
+        if (model == null)
+        {
+            Debug.LogError("Model not assigned!");
+            return;
+        }
+
+        // Reset
+        model.localPosition = startPos;
+        model.localScale = Vector3.one;
+        model.localRotation = Quaternion.identity;
+
+        // Loop rotation left-right (rev effect)
+        model.DOLocalRotate(new Vector3(0, 0, tiltAngle), 0.001f)
+             .SetLoops(-1, LoopType.Yoyo)
+             .SetEase(Ease.InOutSine)
+             .SetId("RevTween");
+
+        // 🚗 Suspension bounce effect (down by -3 on Y)
+        model.DOLocalMoveY(startPos.y - 3f, 0.2f).SetEase(Ease.OutSine);
+    }
+
+    // 🛑 Stop rev and reset rotation + position
+    public void StopRev()
+    {
+        DOTween.Kill("RevTween");
+        DOTween.Kill("RevBounceTween");
+
+        // Smoothly return to start position
+        model.DOLocalMove(startPos, 0.3f).SetEase(Ease.OutSine);
+        model.DOLocalRotate(Vector3.zero, 0.2f).SetEase(Ease.OutSine);
     }
 
     public void MoveCarAnim()
     {
         if (model == null)
         {
-            Debug.LogError("Model is not assigned!");
+            Debug.LogError("Model not assigned!");
             return;
         }
 
-        Vector3 targetScale = new Vector3(0.01f, 0.01f, 0.01f);
-        float targetY = 120f;
+        // Reset before anim
+        model.localPosition = startPos;
+        model.localScale = Vector3.one;
+        model.localRotation = Quaternion.identity;
 
-        // Create a DOTween sequence
-        Sequence animationSequence = DOTween.Sequence();
+        Sequence seq = DOTween.Sequence();
 
-        // Add scale and move animations to play at the same time
-        animationSequence.Join(model.DOScale(targetScale, duration).SetEase(Ease.OutQuad));
-        animationSequence.Join(model.DOLocalMoveY(targetY, duration).SetEase(Ease.OutQuad));
+        // 🚗 Move upward and shrink at the same time
+        seq.Append(model.DOLocalMove(endPos, moveDuration).SetEase(Ease.OutCubic));
+        seq.Join(model.DOScale(Vector3.one * shrinkScale, moveDuration).SetEase(Ease.OutCubic));
 
-        // Optional: Do something when animation completes
-        animationSequence.OnComplete(() =>
+        // Optional reset after complete (remove if you want it to stay at endPos)
+        seq.OnComplete(() =>
         {
-            Debug.Log("Animation complete!");
             ResetCar();
         });
     }
 
-    public void ResetCar()
+    private void ResetCar()
     {
-        model.transform.localPosition = new Vector3(0, -140, 0);
-        model.transform.localScale = new Vector3(1, 1, 1);
+        model.localPosition = startPos;
+        model.localScale = Vector3.one;
+        model.localRotation = Quaternion.identity;
     }
 }
