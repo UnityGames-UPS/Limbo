@@ -3780,7 +3780,7 @@ MonoBehaviour:
     m_HighlightedSprite: {fileID: 21300000, guid: aaf8c9b6c12fc49c8b0879017fc5447b, type: 3}
     m_PressedSprite: {fileID: 0}
     m_SelectedSprite: {fileID: 0}
-    m_DisabledSprite: {fileID: 0}
+    m_DisabledSprite: {fileID: 21300000, guid: 0fe4060a7d26545329a2f8c554e57679, type: 3}
   m_AnimationTriggers:
     m_NormalTrigger: Normal
     m_HighlightedTrigger: Highlighted
@@ -5495,7 +5495,7 @@ MonoBehaviour:
   uiManager: {fileID: 2115417990}
   bonusdata: []
   JSManager: {fileID: 1519490010}
-  testToken: cbcba21556c54edfbcdc96ef2d1caec9
+  testToken: 40be7ae84a8e48ccaac45faa5d6db958
   RaycastBlocker: {fileID: 243527216}
 --- !u!4 &1272847617
 Transform:
