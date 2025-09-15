@@ -97,6 +97,12 @@ public class AudioManager : MonoBehaviour
             case "wl":
                 audioPlayer_wl.mute = toggle;
                 break;
+            case "win":
+                audioWin.mute = toggle;
+                break;
+            case "bet":
+                audioBet_button.mute = toggle;
+                break;
             case "all":
                 audioPlayer_wl.mute = toggle;
                 bg_adudio.mute = toggle;

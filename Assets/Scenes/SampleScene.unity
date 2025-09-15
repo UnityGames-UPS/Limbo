@@ -788,9 +788,9 @@ RectTransform:
   - {fileID: 1175875164}
   - {fileID: 1328365628}
   - {fileID: 1375976641}
-  - {fileID: 433337358}
   - {fileID: 1613184833}
   - {fileID: 2114475525}
+  - {fileID: 433337358}
   m_Father: {fileID: 1418016724}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -5495,7 +5495,7 @@ MonoBehaviour:
   uiManager: {fileID: 2115417990}
   bonusdata: []
   JSManager: {fileID: 1519490010}
-  testToken: fae5c304f73c44f8af9e30309f2e92a9
+  testToken: cbcba21556c54edfbcdc96ef2d1caec9
   RaycastBlocker: {fileID: 243527216}
 --- !u!4 &1272847617
 Transform:
@@ -6852,7 +6852,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 552633606b0b64c509b5eabe86e33ff8, type: 3}
   - {fileID: 8300000, guid: 63c21653588f34f69b36991097fbea17, type: 3}
   - {fileID: 8300000, guid: 5892c79fd645347218f2b9599b4ac5d0, type: 3}
-  - {fileID: 8300000, guid: b209efc7746a9478f837b169d308fb77, type: 3}
+  - {fileID: 8300000, guid: f5366aa51988a4bcf81dff5582976e7a, type: 3}
 --- !u!4 &1508872096
 Transform:
   m_ObjectHideFlags: 0

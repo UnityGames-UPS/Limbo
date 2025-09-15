@@ -89,7 +89,7 @@ public class UiManager : MonoBehaviour
     bool isExit;
     bool isMusic;
     bool isSound;
-    
+
 
     private void Start()
     {
@@ -283,6 +283,9 @@ public class UiManager : MonoBehaviour
             if (SoundOff_Object) SoundOff_Object.SetActive(false);
             if (audioController) audioController.ToggleMute(false, "button");
             if (audioController) audioController.ToggleMute(false, "wl");
+            if (audioController) audioController.ToggleMute(false, "win");
+            if (audioController) audioController.ToggleMute(false, "bet");
+
         }
         else
         {
@@ -290,6 +293,8 @@ public class UiManager : MonoBehaviour
             if (SoundOff_Object) SoundOff_Object.SetActive(true);
             if (audioController) audioController.ToggleMute(true, "button");
             if (audioController) audioController.ToggleMute(true, "wl");
+            if (audioController) audioController.ToggleMute(true, "win");
+            if (audioController) audioController.ToggleMute(true, "bet");
         }
     }
 
