@@ -44,6 +44,13 @@ public class GameManager : MonoBehaviour
     private Vector3 startPos = new Vector3(0, -138, 0);
     private Vector3 endPos = new Vector3(0, -10, 0);
 
+    private bool IsTurboOn = false;
+    [SerializeField] private Button Turbo_Button;
+    private float TextAnimDuration = 0f;  // 🔹 global field
+
+
+
+
     private void Start()
     {
         BetCounter = 0;
@@ -67,6 +74,9 @@ public class GameManager : MonoBehaviour
 
         if (Bet_Button) Bet_Button.onClick.RemoveAllListeners();
         if (Bet_Button) Bet_Button.onClick.AddListener(delegate { StartBet(); audioManager.PlayBetButtonAudio(); });
+
+        if (Turbo_Button) Turbo_Button.onClick.RemoveAllListeners();
+        if (Turbo_Button) Turbo_Button.onClick.AddListener(TurboToggle);
 
 
     }
@@ -160,8 +170,19 @@ public class GameManager : MonoBehaviour
             StartAccelerateAnimation();
             socketManager.AccumulateResult(BetCounter, socketManager.initialData.multipliers[MultiplierCounter]);
             yield return new WaitUntil(() => socketManager.isResultdone);
-            AnimateValue(socketManager.resultData.crashPoint, 1.4f);
-            yield return new WaitForSeconds(1f);
+            bool animDone = false;
+            if (IsTurboOn)
+            {
+                AnimateValue(socketManager.resultData.crashPoint, 1f, () => animDone = true);
+            }
+            else
+            {
+                AnimateValue(socketManager.resultData.crashPoint, 6f, () => animDone = true);
+            }
+
+            //yield return new WaitForSeconds(TextAnimDuration - 0.6f);
+            // yield return new WaitForSeconds(1f);
+            yield return new WaitUntil(() => animDone);
             StopAccelerateAnimation();
             if (socketManager.resultData.winAmount > 0)
             {
@@ -170,7 +191,7 @@ public class GameManager : MonoBehaviour
 
                 win_text.rectTransform
                     .DOScale(1.5f, 1f)
-                    .SetEase(Ease.Linear)   
+                    .SetEase(Ease.Linear)
                     .OnComplete(() =>
                     {
                         win_text.rectTransform
@@ -244,6 +265,25 @@ public class GameManager : MonoBehaviour
 
     }
 
+    void TurboToggle()
+    {
+        audioManager.PlayButtonAudio();
+        if (IsTurboOn)
+        {
+            IsTurboOn = false;
+            Turbo_Button.GetComponent<ImageAnimation>().StopAnimation();
+            Turbo_Button.image.sprite = Turbo_Button.GetComponent<ImageAnimation>().textureArray[0];
+            // Turbo_Button.image.color = new UnityEngine.Color(0.86f, 0.86f, 0.86f, 1);
+        }
+        else
+        {
+            IsTurboOn = true;
+            Turbo_Button.GetComponent<ImageAnimation>().StartAnimation();
+            // Turbo_Button.image.color = new UnityEngine.Color(1, 1, 1, 1);
+        }
+    }
+
+
 
     public void SetWinningChance(int multiplierIndex)
     {
@@ -257,18 +297,36 @@ public class GameManager : MonoBehaviour
         WinChance_text.text = $"Win Chance: {winchance:F2}%";
     }
 
-    public void AnimateValue(double targetValue, float duration)
+    public void AnimateValue(double targetValue, float duration, Action onComplete = null)
     {
         Debug.Log($"##### animate value is  called :");
         ResponseMult_text.alignment = TextAlignmentOptions.Center;
         double currentValue = 1.00;
         audioManager.PlayWLAudio("numberchange");
         DOTween.Kill(this);
+        float extraDuration = 0f;
+
+        if (targetValue > 25 && targetValue <= 50) extraDuration = 0.5f;
+        else if (targetValue > 50 && targetValue <= 100) extraDuration = 1f;
+        else if (targetValue > 100 && targetValue <= 200) extraDuration = 2f;
+        else if (targetValue > 200 && targetValue <= 300) extraDuration = 3f;
+        else if (targetValue > 300 && targetValue <= 400) extraDuration = 4f;
+        else if (targetValue > 400 && targetValue <= 500) extraDuration = 5f;
+        else if (targetValue > 500 && targetValue <= 600) extraDuration = 6f;
+        else if (targetValue > 600 && targetValue <= 700) extraDuration = 7f;
+        else if (targetValue > 700 && targetValue <= 800) extraDuration = 8f;
+        else if (targetValue > 800 && targetValue <= 900) extraDuration = 9f;
+        else if (targetValue > 900 && targetValue <= 1000) extraDuration = 10f;
+        
+        if (targetValue < 1.3 && !IsTurboOn) duration = duration/2f;
+
+        float finalDuration = duration + extraDuration;
+        TextAnimDuration = finalDuration;
         DOTween.To(
             () => currentValue,
             x => currentValue = x,
             targetValue,
-            duration
+            finalDuration
         )
         .OnUpdate(() =>
         {
@@ -280,6 +338,7 @@ public class GameManager : MonoBehaviour
         })
         .OnComplete(() =>
       {
+         onComplete?.Invoke();
           if (ResponseMult_text != null && socketManager != null && socketManager.resultData != null)
           {
               if (socketManager.resultData.winAmount > 0)
@@ -287,8 +346,9 @@ public class GameManager : MonoBehaviour
               else
                   ResponseMult_text.color = Color.red;
           }
+         // onComplete?.Invoke();
       })
-        .SetEase(Ease.Linear)
+        .SetEase(Ease.OutExpo)
         .SetId(this);
     }
 
