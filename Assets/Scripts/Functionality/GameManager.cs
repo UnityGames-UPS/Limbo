@@ -319,6 +319,7 @@ public class GameManager : MonoBehaviour
         else if (targetValue > 900 && targetValue <= 1000) extraDuration = 10f;
         
         if (targetValue < 1.3 && !IsTurboOn) duration = duration/2f;
+        if(IsTurboOn && extraDuration>0) extraDuration = extraDuration/2f;
 
         float finalDuration = duration + extraDuration;
         TextAnimDuration = finalDuration;
