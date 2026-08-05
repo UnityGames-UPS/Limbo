@@ -14,6 +14,9 @@ public class AudioManager : MonoBehaviour
 
     [SerializeField] private AudioClip[] clips;
 
+    private bool isForceMuted = false;
+    private readonly Dictionary<AudioSource, bool> preFocusMuteState = new Dictionary<AudioSource, bool>();
+
     private void Start()
     {
         if (bg_adudio) bg_adudio.Play();
@@ -86,6 +89,9 @@ public class AudioManager : MonoBehaviour
 
     internal void ToggleMute(bool toggle, string type = "all")
     {
+        // An explicit user toggle always wins over a stale/stuck forced focus-mute.
+        isForceMuted = false;
+
         switch (type)
         {
             case "bg":
@@ -109,6 +115,40 @@ public class AudioManager : MonoBehaviour
                 audioPlayer_button.mute = toggle;
                 break;
         }
+    }
+
+    private IEnumerable<AudioSource> AllSources()
+    {
+        yield return bg_adudio;
+        yield return audioPlayer_wl;
+        yield return audioPlayer_button;
+        yield return audioBet_button;
+        yield return audioWin;
+    }
+
+    internal void SetMuteAll(bool forceMute)
+    {
+        if (forceMute == isForceMuted) return;
+        isForceMuted = forceMute;
+
+        foreach (var source in AllSources())
+        {
+            if (source == null) continue;
+            if (forceMute)
+            {
+                preFocusMuteState[source] = source.mute;
+                source.mute = true;
+            }
+            else
+            {
+                source.mute = preFocusMuteState.TryGetValue(source, out bool prevMuted) ? prevMuted : source.mute;
+            }
+        }
+    }
+
+    private void OnApplicationFocus(bool focus)
+    {
+        SetMuteAll(!focus);
     }
 
 }
