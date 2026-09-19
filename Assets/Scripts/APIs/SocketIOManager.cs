@@ -172,6 +172,7 @@ public class SocketIOManager : MonoBehaviour
     //   Application.ExternalCall("window.parent.postMessage", "authToken", "*");
 
 #if UNITY_WEBGL && !UNITY_EDITOR
+        JSManager.RegisterAuthTokenListener(gameObject.name); // listen for host's TokenReceived before asking
         JSManager.SendCustomMessage("authToken");
         StartCoroutine(WaitForAuthToken(options));
 #else
@@ -426,7 +427,7 @@ public class SocketIOManager : MonoBehaviour
   internal void ReactNativeCallOnFailedToConnect() //BackendChanges
   {
 #if UNITY_WEBGL && !UNITY_EDITOR
-    JSManager.SendCustomMessage("onExit");
+    JSManager.SendCustomMessage("OnExit"); // was "onExit" — host matches "OnExit"
 #endif
   }
 
@@ -525,13 +526,8 @@ public class SocketIOManager : MonoBehaviour
             this.manager.Close();
           }
 
-          Application.ExternalCall("window.parent.postMessage", "onExit", "*");
 #if UNITY_WEBGL && !UNITY_EDITOR
-            Application.ExternalEval(@"
-              if(window.ReactNativeWebView){
-                window.ReactNativeWebView.postMessage('onExit');
-              }
-            ");
+          JSManager.SendCustomMessage("OnExit");
 #endif
           break;
         }
@@ -549,14 +545,6 @@ public class SocketIOManager : MonoBehaviour
     isLoaded = true;
     gameManager.setInitialUI();
     RaycastBlocker.SetActive(false);
-    Application.ExternalCall("window.parent.postMessage", "OnEnter", "*");
-#if UNITY_WEBGL && !UNITY_EDITOR //BackendChanges
-            Application.ExternalEval(@"
-            if(window.ReactNativeWebView){
-            window.ReactNativeWebView.postMessage('OnEnter');
-            }
-            ");
-#endif
   }
 
 
